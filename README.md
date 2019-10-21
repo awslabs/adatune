@@ -1,7 +1,7 @@
 AdaTune
 =======
 
-AdaTune is a library to perform gradient based hyperparameter tuning for training deep neural networks. AdaTune currently supports tuning of the `learning_rate` parameter but some of the methods implemented here can be extended to other hyperparameters like `momentum` or `weight_decay` etc. AdaTune provides the following gradient based hyperparameter tuning algorithms -  [HD](https://arxiv.org/abs/1703.04782), [RTHO](http://proceedings.mlr.press/v70/franceschi17a.html) and our newly proposed algorithm, [MARTHE](https://openreview.net/forum?id=Ske6qJSKPH). The repository also contains other commonly used non-adaptive `learning_rate` adaptation strategies like staircase-decay, exponential-decay and cosine-annealing-with-restarts. The library is implemented in PyTorch. 
+AdaTune is a library to perform gradient based hyperparameter tuning for training deep neural networks. AdaTune currently supports tuning of the `learning_rate` parameter but some of the methods implemented here can be extended to other hyperparameters like `momentum` or `weight_decay` etc. AdaTune provides the following gradient based hyperparameter tuning algorithms -  [HD](https://arxiv.org/abs/1703.04782), [RTHO](http://proceedings.mlr.press/v70/franceschi17a.html) and our newly proposed algorithm, [MARTHE](https://arxiv.org/abs/1910.08525). The repository also contains other commonly used non-adaptive `learning_rate` adaptation strategies like staircase-decay, exponential-decay and cosine-annealing-with-restarts. The library is implemented in PyTorch. 
 
 Mathematical Formulation of the Problem
 =======================================
@@ -111,21 +111,21 @@ Results of ResNet-18 on CIFAR-100, and Adam as the inner optimizer concerning: a
 ![Loss CIFAR100 ResNet](figures/cifar100resnet_one_LOSS-1.png)
 ![LR CIFAR100 ResNet](figures/cifar100resnet_one_LR-1.png)
 
-For further details, please refer to the original paper.
+For further details, please refer to the original [paper](https://arxiv.org/abs/1910.08525).
 
 How to cite
 ===========
 The idea of this code is from the following paper:
 
 Donini et al. "Scheduling the Learning Rate Via Hypergradients: New Insights and a New Algorithm."
-arXiv preprint arXiv:-------- (2019).
+arXiv preprint arXiv:1910.08525 (2019).
 
 Bibtex citation:
 ```
 @article{donini2019MARTHE,
   title={Scheduling the Learning Rate Via Hypergradients: New Insights and a New Algorithm},
   author={Donini, Michele and Franceschi, Luca and Majumder, Orchid and Pontil, Massimiliano and Frasconi, Paolo},
-  journal={arXiv preprint arXiv:--------},
+  journal={arXiv preprint arXiv:1910.08525},
   year={2019}
 }
 ```
