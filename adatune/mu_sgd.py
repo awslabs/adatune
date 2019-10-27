@@ -100,9 +100,9 @@ class MuSGD(object):
         for param_group in self.optimizer.param_groups:
             param_group['lr'] = new_lr
 
-        # # Update hyper-LR
-        # for param_group in self.hyper_optim.param_groups:
-        #     param_group['lr'] = np.max([param_group['lr'] + self.alpha * hyper_grad * new_lr, 0.0])
+        # Update hyper-LR
+        for param_group in self.hyper_optim.param_groups:
+            param_group['lr'] = np.max([param_group['lr'] + self.alpha * hyper_grad * new_lr, 0.0])
 
         # Update mu
         if self.mu_mode == 'auto':
