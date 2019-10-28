@@ -93,7 +93,7 @@ In order to automatically set and adapt `hyper-lr`, it is possible to set the va
 
 You can use a linear search algorithm to gradually reduce the value of `alpha` starting from a higher value and seeing when the algorithm is not diverging. Generally, if the value of `alpha` is high for a given task, the algorithm would diverge within the first few epochs.
 
-In future, we plan to implement a find_hyper_lr method to automatically handle the linear search over `alpha` as well.
+In future, we plan to implement a find_hyper_lr method to automatically handle the linear search over `alpha` as well (removing completely any human intervention in the whole precedure).
 
 For both, there is a parameter called `model-loc` which determines where the trained model would be saved. Please create this directory before running the code if you are using a different directory than the current working directory.
 
