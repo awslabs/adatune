@@ -76,7 +76,7 @@ python bin/baselines.py --network vgg --dataset cifar_10 --optimizer sgd --momen
 
 * `rtho.py` - This file contains the implementation RTHO and MARTHE. MARTHE is a generalization of RTHO and HD. It is implemented together with RTHO because both the algorithms share the common component of computing the Hessian-Vector-Product.
 
-If you want to run MARTHE or RTHO, you can run it like this:
+If you want to run MARTHE, HD, or RTHO, you can run it like this:
 
 ```
 python bin/rtho.py --network vgg --dataset cifar_10 --optimizer sgd --momentum 0.9 --hyper-lr 1e-8
@@ -85,9 +85,15 @@ if you pass `mu` as 1.0, the algorithm behaves as RTHO. If you pass `mu` as 0, t
 
 In order to automatically set and adapt `mu`, set it to any value less than 0.0. You can also pass a value of `mu` in the range of [0.99, 0.999] if you don't want an adaptive behavior for `mu` only. 
 
-In order to set `hyper-lr`, you can use a linear search algorithm to gradually reduce the value of `hyper-lr` starting from a higher value and seeing when the algorithm is not diverging. Generally, if the value of `hyper-lr` is high for a given task, the algorithm would diverge within the first few epochs. In future, we plan to implement a `find_hyper_lr` method to automatically handle this as well. 
+If you pass `alpha` equals to 0.0, the `hyper-lr` value will stay the same for the whole training procedure.
 
 Generally, the value of `hyper-lr` should be set to minimum 3-4 scales lower for Adam when compared to SGD (w/o momentum) for all the gradient based methods.
+
+In order to automatically set and adapt `hyper-lr`, it is possible to set the value of `alpha` positive and small (e.g. 1e-6).
+
+You can use a linear search algorithm to gradually reduce the value of `alpha` starting from a higher value and seeing when the algorithm is not diverging. Generally, if the value of `alpha` is high for a given task, the algorithm would diverge within the first few epochs.
+
+In future, we plan to implement a find_hyper_lr method to automatically handle the linear search over `alpha` as well.
 
 For both, there is a parameter called `model-loc` which determines where the trained model would be saved. Please create this directory before running the code if you are using a different directory than the current working directory.
 
