@@ -122,6 +122,11 @@ def train_baselines(network_name, dataset, num_epoch, batch_size, optim_name, lr
         print('val_accuracy at epoch :{} is : {}'.format(epoch, val_acc))
         print('best val_accuracy is : {}'.format(best_val_accuracy))
 
+        cur_lr = 0.0
+        for param_group in optimizer.param_groups:
+            cur_lr = param_group['lr']
+        print('learning_rate after epoch :{} is : {}'.format(epoch, cur_lr))
+
 
 if __name__ == '__main__':
     args = cli_def().parse_args()
