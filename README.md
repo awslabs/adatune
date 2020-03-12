@@ -11,25 +11,24 @@ methods (such as SGD) only on the basis of the given learning task, aiming at pr
 with associated small validation error.
 
 Theoretically, we have to solve the problem of finding a learning rate (LR) schedule under the framework of  gradient-based hyperparameter optimization.
-In this sense, we consider as an optimal schedule <img src="https://latex.codecogs.com/svg.latex?\Large&space;\eta^*%20=%20(\eta^*_0,\dots,\eta^*_{T-1})\in\mathbb{R}^T_+" title="" />
-a solution to the following constrained optimization problem:
+In this sense, we consider as an optimal schedule <img src="https://render.githubusercontent.com/render/math?math=\eta^*=(\eta^*_0,\dots,\eta^*_{T-1})\in\mathbb{R}_{\geq0}^T"> a solution to the following constrained optimization problem:
 
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;\min%20\{f_T(\eta)%20=E(w_T(\eta))%20:%20\eta%20\in%20\mathbb{R}_+^T\}%20\quad%20s.t.%20\quad%20w_0%20=%20\bar{w},%20\quad%20w_{t+1}(\eta)=\Phi_t(w_{t}(\eta),\eta_t)" title="\Large \min \{f_T(\eta) =E(w_T(\eta)) : \eta \in \mathbb{R}_+^T\} \quad \text{s.t.} \quad w_0 = \bar{w}, \quad w_{t+1}(\eta)=\Phi_t(w_{t}(\eta),\eta_t)" />
+<img src="https://render.githubusercontent.com/render/math?math=\min%20\{f_T(\eta)=E(w_T(\eta)):\eta\in\mathbb{R}_{\geq0}^T\}\quad%20s.t.\quad%20w_0=\bar{w},\quad%20w_{t+1}(\eta)=\Phi_t(w_{t}(\eta),\eta_t)" title="" />
 
-for <img src="https://latex.codecogs.com/svg.latex?\Large&space;t=\{0,%20\dots,%20T-1\}" title="\Large t=\{0, \dots, T-1\}" />,
-where <img src="https://latex.codecogs.com/svg.latex?\Large&space;E:\mathbb{R}^d\to\mathbb{R}_+" title="\Large E:\mathbb{R}^d\to\mathbb{R}_+" /> is an objective function,
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;\Phi_t:\mathbb{R}^d\times%20\mathbb{R}_+\to\mathbb{R}^d" title="\Large \Phi_t:\mathbb{R}^d\times \mathbb{R}_+\to\mathbb{R}^d" /> is a (possibly stochastic) weight update dynamics,
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;\bar{w}\in\mathbb{R}^d" title="\Large \bar{w}\in\mathbb{R}^d" /> represents the initial model weights (parameters) and finally
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;w_t" title="\Large w_t" /> are the weights after t iterations. 
+for <img src="https://render.githubusercontent.com/render/math?math=t=\{0,%20\dots,%20T-1\}" title=" " />,
+where <img src="https://render.githubusercontent.com/render/math?math=E:\mathbb{R}^d\to\mathbb{R}_{\geq0}" title=" " /> is an objective function,
+<img src="https://render.githubusercontent.com/render/math?math=\Phi_t:\mathbb{R}^d\times%20\mathbb{R}_{\geq0}\to\mathbb{R}^d" title=" " /> is a (possibly stochastic) weight update dynamics,
+<img src="https://render.githubusercontent.com/render/math?math=\bar{w}\in\mathbb{R}^d" title=" " /> represents the initial model weights (parameters) and finally
+<img src="https://render.githubusercontent.com/render/math?math=w_t" title=" " /> are the weights after t iterations. 
 
 We can think of E as either the training or the validation loss of the model,
-while the dynamics <img src="https://latex.codecogs.com/svg.latex?\Large&space;\Phi" title="\Large \Phi" /> describe the update rule (such as SGD, SGD-Momentum, Adam etc.). For example in the case of SGD,
-while the dynamics <img src="https://latex.codecogs.com/svg.latex?\Large&space;\Phi_t(w_t,\eta_t)=w_t-\eta_t\nabla%20L_t(w_t)" title="\Large \Phi_t(w_t,\eta_t)=w_t-\eta_t\nabla L_t(w_t)" /> with
-<img src="https://latex.codecogs.com/svg.latex?\Large&space;L_t(w_t)" title="\Large L_t(w_t)" /> the (possibly regularized) training loss
+while the dynamics <img src="https://render.githubusercontent.com/render/math?math=\Phi" title=" " /> describe the update rule (such as SGD, SGD-Momentum, Adam etc.). For example in the case of SGD,
+while the dynamics <img src="https://render.githubusercontent.com/render/math?math=\Phi_t(w_t,\eta_t)=w_t-\eta_t\nabla%20L_t(w_t)" title=" " /> with
+<img src="https://render.githubusercontent.com/render/math?math=L_t(w_t)" title=" " /> the (possibly regularized) training loss
 on the t-th minibatch. The horizon T should be large enough so that
 the training error can be effectively minimized, in order to avoid underfitting.
-Note that a too large value of T does not necessarily harm since <img src="https://latex.codecogs.com/svg.latex?\Large&space;\eta_k=0" title="\Large \eta_k=0" />
-for <img src="https://latex.codecogs.com/svg.latex?\Large&space;k>\bar{T}" title="\Large k>\bar{T}" /> is still a feasible solution, implementing early stopping in
+Note that a too large value of T does not necessarily harm since <img src="https://render.githubusercontent.com/render/math?math=\eta_k=0" title=" " />
+for <img src="https://render.githubusercontent.com/render/math?math=k \geq \bar{T}" title="" /> is still a feasible solution, implementing early stopping in
 this setting.
 
 Installation
