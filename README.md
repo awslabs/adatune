@@ -11,7 +11,7 @@ methods (such as SGD) only on the basis of the given learning task, aiming at pr
 with associated small validation error.
 
 Theoretically, we have to solve the problem of finding a learning rate (LR) schedule under the framework of  gradient-based hyperparameter optimization.
-In this sense, we consider as an optimal schedule <img src="https://latex.codecogs.com/svg.latex?\Large&space;\eta^*%20=%20(\eta^*_0,\dots,\eta^*_{T-1})\in\mathbb{R}^T_+" title="\Large \eta^* = (\eta^*_0,\dots,\eta^*_{T-1})\in\mathbb{R}^T_+" />
+In this sense, we consider as an optimal schedule <img src="https://latex.codecogs.com/svg.latex?\Large&space;\eta^*%20=%20(\eta^*_0,\dots,\eta^*_{T-1})\in\mathbb{R}^T_+" title="" />
 a solution to the following constrained optimization problem:
 
 <img src="https://latex.codecogs.com/svg.latex?\Large&space;\min%20\{f_T(\eta)%20=E(w_T(\eta))%20:%20\eta%20\in%20\mathbb{R}_+^T\}%20\quad%20s.t.%20\quad%20w_0%20=%20\bar{w},%20\quad%20w_{t+1}(\eta)=\Phi_t(w_{t}(\eta),\eta_t)" title="\Large \min \{f_T(\eta) =E(w_T(\eta)) : \eta \in \mathbb{R}_+^T\} \quad \text{s.t.} \quad w_0 = \bar{w}, \quad w_{t+1}(\eta)=\Phi_t(w_{t}(\eta),\eta_t)" />
