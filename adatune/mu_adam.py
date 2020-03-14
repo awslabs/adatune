@@ -21,7 +21,8 @@ from adatune.utils import *
 
 class MuAdam(object):
 
-    def __init__(self, optimizer, hyper_lr, grad_clipping, first_order, mu, alpha, device):
+    def __init__(self, optimizer, hyper_lr, adapt_hyper_lr, grad_clipping, first_order, mu, adapt_mu, hyper_hyper_lr,
+                 device):
         self.optimizer = optimizer
         self.lr = self.optimizer.param_groups[0]['lr']
         self.beta1 = self.optimizer.param_groups[0]['betas'][0]
@@ -34,8 +35,9 @@ class MuAdam(object):
         self.first_order = first_order
         self.device = device
         self.mu = mu
-        self.mu_mode = 'auto' if self.mu < 0.0 else 'manual'
-        self.alpha = alpha
+        self.adapt_mu = adapt_mu
+        self.adapt_hyper_lr = adapt_hyper_lr
+        self.hyper_hyper_lr = hyper_hyper_lr
         self.z_0 = None
         self.z_1 = None
         self.z_2 = None
@@ -43,10 +45,11 @@ class MuAdam(object):
         self.b = None
         self.c = 0.0
         self.state_init = False
+        self.past_hyper_grad = None
 
     def flatten_state(self, net):
-        return (torch.cat([self.optimizer.state[v]['exp_avg'].view(-1) for v in net.parameters()]),
-                torch.cat([self.optimizer.state[v]['exp_avg_sq'].view(-1) for v in net.parameters()]))
+        return (torch.cat([self.optimizer.state[v]['exp_avg'].reshape(-1) for v in net.parameters()]),
+                torch.cat([self.optimizer.state[v]['exp_avg_sq'].reshape(-1) for v in net.parameters()]))
 
     def clip_grad(self, net):
         if self.grad_clipping:
@@ -61,7 +64,7 @@ class MuAdam(object):
             return
 
         self.clip_grad(first_grad)
-        grad_flatten = torch.cat([g.view(-1) for g in first_grad]).requires_grad_(True)
+        grad_flatten = torch.cat([g.reshape(-1) for g in first_grad]).requires_grad_(True)
 
         coeff = (math.sqrt(1.0 - self.beta2 ** self.step)) / (1.0 - self.beta1 ** self.step)
 
@@ -74,7 +77,7 @@ class MuAdam(object):
             hvp = ag.grad(grad_flatten @ self.z_2, net.parameters())
             self.clip_grad(hvp)
             grad_flatten = grad_flatten.detach()
-            hvp_flatten = torch.cat([h.view(-1) for h in hvp])
+            hvp_flatten = torch.cat([h.reshape(-1) for h in hvp])
 
             m_t, v_t = self.flatten_state(net)
 
@@ -85,7 +88,7 @@ class MuAdam(object):
             a_33 = (1.0 - self.lr * coeff) * (a_33_inner_1 - a_33_inner_2) * hvp_flatten
 
             self.z_2 = self.mu * (a_31 * self.z_0 + a_32 * self.z_1 + a_33)
-            self.z_2 = self.z_2 + torch.neg(coeff * (m_t / torch.sqrt(v_t + self.eps)))
+            self.z_2 += torch.neg(coeff * (m_t / torch.sqrt(v_t + self.eps)))
 
             self.z_0 = self.mu * (self.beta1 * self.z_0 + (1.0 - self.beta1) * hvp_flatten)
             self.z_1 = self.mu * (self.beta2 * self.z_1 + 2.0 * (1.0 - self.beta2) * grad_flatten * hvp_flatten)
@@ -103,7 +106,7 @@ class MuAdam(object):
             return
 
         self.clip_grad(val_grad)
-        val_grad_flatten = torch.cat([f.view(-1) for f in val_grad])
+        val_grad_flatten = torch.cat([f.reshape(-1) for f in val_grad])
 
         mat_mul = val_grad_flatten @ self.z_2
         hyper_grad = mat_mul.item()
@@ -116,12 +119,17 @@ class MuAdam(object):
         for param_group in self.optimizer.param_groups:
             param_group['lr'] = new_lr
 
-        # # Update hyper-LR
-        for param_group in self.hyper_optim.param_groups:
-            param_group['lr'] = np.max([param_group['lr'] + self.alpha * hyper_grad * new_lr, 0.0])
+        # Update hyper-LR
+        if self.adapt_hyper_lr:
+            if self.past_hyper_grad:
+                for param_group in self.hyper_optim.param_groups:
+                    cur_hyper_lr = param_group['lr']
+                    new_hyper_lr = cur_hyper_lr + self.hyper_hyper_lr * (hyper_grad * self.past_hyper_grad)
+                    param_group['lr'] = new_hyper_lr
+            self.past_hyper_grad = hyper_grad
 
         # Update mu
-        if self.mu_mode == 'auto':
+        if self.adapt_mu:
             grad_mult = (val_grad_flatten @ self.b).item()
             q_norm = new_lr / grad_mult
             z = np.maximum(np.minimum(q_norm, 1.), 0.)

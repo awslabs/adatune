@@ -19,7 +19,8 @@ from adatune.utils import *
 
 class MuSGD(object):
 
-    def __init__(self, optimizer, hyper_lr, grad_clipping, first_order, mu, alpha, device):
+    def __init__(self, optimizer, hyper_lr, adapt_hyper_lr, grad_clipping, first_order, mu, adapt_mu, hyper_hyper_lr,
+                 device):
         self.optimizer = optimizer
         self.lr = self.optimizer.param_groups[0]['lr']
         self.momentum = self.optimizer.param_groups[0]['momentum']
@@ -32,14 +33,16 @@ class MuSGD(object):
         self.z_0 = None
         self.z_1 = None
         self.c = 0.0
-        self.alpha = alpha
+        self.hyper_hyper_lr = hyper_hyper_lr
         self.mu = mu
-        self.mu_mode = 'auto' if self.mu < 0.0 else 'manual'
+        self.adapt_mu = adapt_mu
+        self.adapt_hyper_lr = adapt_hyper_lr
         self.b = None
         self.state_init = False
+        self.past_hyper_grad = None
 
     def flatten_state(self, net):
-        return torch.cat([self.optimizer.state[v]['momentum_buffer'].view(-1) for v in net.parameters()])
+        return torch.cat([self.optimizer.state[v]['momentum_buffer'].reshape(-1) for v in net.parameters()])
 
     def clip_grad(self, net):
         if self.grad_clipping:
@@ -54,7 +57,7 @@ class MuSGD(object):
 
         self.clip_grad(first_grad)
 
-        grad_flatten = torch.cat([g.view(-1) for g in first_grad]).requires_grad_(True)
+        grad_flatten = torch.cat([g.reshape(-1) for g in first_grad]).requires_grad_(True)
 
         if self.first_order or self.z_0 is None:
             self.z_0 = torch.neg(grad_flatten)
@@ -65,15 +68,15 @@ class MuSGD(object):
         else:
             hvp = ag.grad(grad_flatten @ self.z_0, net.parameters())
             self.clip_grad(hvp)
-            hvp_flatten = torch.cat([h.view(-1) for h in hvp])
+            hvp_flatten = torch.cat([h.reshape(-1) for h in hvp])
             if self.momentum > 0.0:
                 v_t = self.flatten_state(net)
                 self.z_0 = self.mu * (self.z_0 - (self.lr * hvp_flatten + self.lr * self.momentum * self.z_1))
-                self.z_0 = self.z_0 + torch.neg(self.momentum * v_t + grad_flatten)
+                self.z_0 += torch.neg(self.momentum * v_t + grad_flatten)
                 self.z_1 = self.mu * (hvp_flatten + self.momentum * self.z_1)
             else:
                 self.z_0 = self.mu * (self.z_0 - self.lr * hvp_flatten)
-                self.z_0 = self.z_0 + torch.neg(grad_flatten)
+                self.z_0 += torch.neg(grad_flatten)
 
         self.z_0 = self.z_0.detach()
         if self.momentum > 0.0:
@@ -87,7 +90,7 @@ class MuSGD(object):
             return
 
         self.clip_grad(val_grad)
-        val_grad_flatten = torch.cat([f.view(-1) for f in val_grad])
+        val_grad_flatten = torch.cat([f.reshape(-1) for f in val_grad])
 
         mat_mul = val_grad_flatten @ self.z_0
         hyper_grad = mat_mul.item()
@@ -101,11 +104,16 @@ class MuSGD(object):
             param_group['lr'] = new_lr
 
         # Update hyper-LR
-        for param_group in self.hyper_optim.param_groups:
-            param_group['lr'] = np.max([param_group['lr'] + self.alpha * hyper_grad * new_lr, 0.0])
+        if self.adapt_hyper_lr:
+            if self.past_hyper_grad:
+                for param_group in self.hyper_optim.param_groups:
+                    cur_hyper_lr = param_group['lr']
+                    new_hyper_lr = cur_hyper_lr + self.hyper_hyper_lr * (hyper_grad * self.past_hyper_grad)
+                    param_group['lr'] = new_hyper_lr
+            self.past_hyper_grad = hyper_grad
 
         # Update mu
-        if self.mu_mode == 'auto':
+        if self.adapt_mu:
             grad_mult = (val_grad_flatten @ self.b).item()
             q_norm = new_lr / grad_mult
             z = np.maximum(np.minimum(q_norm, 1.), 0.)

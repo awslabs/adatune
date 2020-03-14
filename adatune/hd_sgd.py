@@ -48,11 +48,11 @@ class SGDHD(Optimizer):
             if p.grad is None:
                 view = torch.zeros_like(p.data)
             elif p.grad.data.is_sparse:
-                view = p.grad.data.to_dense().view(-1)
+                reshape = p.grad.data.to_dense().reshape(-1)
             else:
-                view = p.grad.data.view(-1)
+                reshape = p.grad.data.reshape(-1)
             if weight_decay != 0:
-                view.add_(weight_decay, p.data.view(-1))
+                reshape.add_(weight_decay, p.data.reshape(-1))
             views.append(view)
         return torch.cat(views, 0)
 

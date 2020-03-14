@@ -134,7 +134,7 @@ class ResNet(nn.Module):
         out = self.layer3(out)
         out = self.layer4(out)
         out = F.avg_pool2d(out, 4)
-        out = out.view(out.size(0), -1)
+        out = out.reshape(out.size(0), -1)
         out = self.linear(out)
         return out
 
@@ -229,7 +229,7 @@ class WideResNet(nn.Module):
         out = self.layer3(out)
         out = F.relu(self.bn1(out))
         out = F.avg_pool2d(out, 8)
-        out = out.view(out.size(0), -1)
+        out = out.reshape(out.size(0), -1)
         out = self.linear(out)
 
         return out
@@ -265,7 +265,7 @@ class LeNet(nn.Module):
         out = F.max_pool2d(out, 2)
         out = F.relu(self.conv2(out))
         out = F.max_pool2d(out, 2)
-        out = out.view(out.size(0), -1)
+        out = out.reshape(out.size(0), -1)
         out = F.relu(self.fc1(out))
         out = F.relu(self.fc2(out))
         out = self.fc3(out)
@@ -285,7 +285,7 @@ class MLP(nn.Module):
         self.fc3 = nn.Linear(n_2, num_classes)
 
     def forward(self, din):
-        din = din.view(-1, 28 * 28)
+        din = din.reshape(-1, 28 * 28)
         dout = F.relu(self.fc1(din))
         dout = F.relu(self.fc2(dout))
         return self.fc3(dout)
@@ -394,7 +394,7 @@ class DenseNet(nn.Module):
         out = self.trans2(self.dense2(out))
         out = self.dense3(out)
         out = F.avg_pool2d(F.relu(self.bn1(out)), 8)
-        out = out.view(out.size(0), -1)
+        out = out.reshape(out.size(0), -1)
         out = self.fc(out)
         return out
 
@@ -421,7 +421,7 @@ class VGG(nn.Module):
 
     def forward(self, x):
         out = self.features(x)
-        out = out.view(out.size(0), -1)
+        out = out.reshape(out.size(0), -1)
         #out = self.dropout(out)
         out = self.classifier(out)
         return out

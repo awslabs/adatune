@@ -35,18 +35,20 @@ def cli_def():
     parser.add_argument('--lr', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.9)
     parser.add_argument('--wd', type=float, default=5e-4)
+    parser.add_argument('--adapt-hyper-lr', action='store_true')
     parser.add_argument('--hyper-lr', type=float, default=1e-8)
-    parser.add_argument('--alpha', type=float, default=1e-6)
+    parser.add_argument('--hyper-hyper-lr', type=float, default=1e-6)
     parser.add_argument('--model-loc', type=str, default='./model.pt')
     parser.add_argument('--grad-clipping', type=float, default=100.0)
+    parser.add_argument('--adapt-mu', action='store_true')
     parser.add_argument('--mu', type=float, default=0.99999)
     parser.add_argument('--first-order', action='store_true')
     parser.add_argument('--seed', type=int, default=42)
     return parser
 
 
-def train_rtho(network_name, dataset, num_epoch, batch_size, optim_name, lr, momentum, wd, hyper_lr, alpha, model_loc,
-               grad_clipping, first_order, seed, mu=1.0):
+def train_rtho(network_name, dataset, num_epoch, batch_size, optim_name, lr, momentum, wd, adapt_hyper_lr, hyper_lr,
+               hyper_hyper_lr, model_loc, grad_clipping, first_order, seed, adapt_mu, mu):
     torch.manual_seed(seed)
 
     # We are using cuda for training - no point trying out on CPU for ResNet
@@ -65,10 +67,12 @@ def train_rtho(network_name, dataset, num_epoch, batch_size, optim_name, lr, mom
 
     if optim_name == 'adam':
         optimizer = optim.Adam(net.parameters(), lr=lr, weight_decay=wd, eps=1e-4)
-        hyper_optim = MuAdam(optimizer, hyper_lr, grad_clipping, first_order, mu, alpha, device)
+        hyper_optim = MuAdam(optimizer, hyper_lr, adapt_hyper_lr, grad_clipping, first_order, mu, adapt_mu,
+                             hyper_hyper_lr, device)
     else:
         optimizer = optim.SGD(net.parameters(), lr=lr, momentum=momentum, weight_decay=wd)
-        hyper_optim = MuSGD(optimizer, hyper_lr, grad_clipping, first_order, mu, alpha, device)
+        hyper_optim = MuSGD(optimizer, hyper_lr, adapt_hyper_lr, grad_clipping, first_order, mu, adapt_mu,
+                            hyper_hyper_lr, device)
 
     vg = ValidationGradient(test_data, nn.CrossEntropyLoss(), device)
     for epoch in range(num_epoch):
@@ -123,5 +127,5 @@ if __name__ == '__main__':
         os.remove(args.model_loc)
 
     train_rtho(args.network, args.dataset, args.num_epoch, args.batch_size, args.optimizer, args.lr, args.momentum,
-               args.wd, args.hyper_lr, args.alpha, args.model_loc, args.grad_clipping, args.first_order, args.seed,
-               args.mu)
+               args.wd, args.adapt_hyper_lr, args.hyper_lr, args.hyper_hyper_lr, args.model_loc, args.grad_clipping,
+               args.first_order, args.seed, args.adapt_mu, args.mu)
