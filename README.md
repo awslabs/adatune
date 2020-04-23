@@ -106,15 +106,8 @@ List of available Datasets/DataLoaders can be found in `data_loader.py`. Current
 
 Results comparing MARTHE and other methods
 ==========================================
-Results of VGG-11 on CIFAR-10, and SGDM as the inner optimizer concerning: accuracy, loss of the objective function on the validation set and generated learning rate schedule for each method.
-![Accuracy CIFAR10 VGG](figures/cifar10vgg_one_ACC-1.png)
-![Loss CIFAR10 VGG](figures/cifar10vgg_one_LOSS-1.png)
-![LR CIFAR10 VGG](figures/cifar10vgg_one_LR-1.png)
+![Accuracy CIFAR10 VGG](figures/marthe_comparison.png)
 
-Results of ResNet-18 on CIFAR-100, and Adam as the inner optimizer concerning: accuracy, loss of the objective function on the validation set and generated learning rate schedule for each method.
-![Accuracy CIFAR100 ResNet](figures/cifar100resnet_one_ACC-1.png)
-![Loss CIFAR100 ResNet](figures/cifar100resnet_one_LOSS-1.png)
-![LR CIFAR100 ResNet](figures/cifar100resnet_one_LR-1.png)
 
 For further details, please refer to the original [paper](https://arxiv.org/abs/1910.08525).
 
@@ -123,14 +116,15 @@ How to cite
 The idea of this code is from the following paper:
 
 Donini et al. "Scheduling the Learning Rate Via Hypergradients: New Insights and a New Algorithm."
-arXiv preprint arXiv:1910.08525 (2019).
+IJCAI-PRCAI 2020.
 
 Bibtex citation:
 ```
-@article{donini2019MARTHE,
+@inproceedings{donini2020MARTHE,
   title={Scheduling the Learning Rate Via Hypergradients: New Insights and a New Algorithm},
   author={Donini, Michele and Franceschi, Luca and Majumder, Orchid and Pontil, Massimiliano and Frasconi, Paolo},
-  journal={arXiv preprint arXiv:1910.08525},
-  year={2019}
+  booktitle={Proceedings of the 29th International Joint Conference on Artificial Intelligence and the 17th Pacific Rim International Conference on Artificial Intelligence},
+  year={2020},
+  organization={AAAI Press}
 }
 ```
