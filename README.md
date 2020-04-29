@@ -115,13 +115,13 @@ How to cite
 ===========
 The idea of this code is from the following paper:
 
-Donini et al. "Scheduling the Learning Rate Via Hypergradients: New Insights and a New Algorithm."
+Donini et al. "MARTHE: Scheduling the Learning Rate Via Online Hypergradients"
 IJCAI-PRCAI 2020.
 
 Bibtex citation:
 ```
 @inproceedings{donini2020MARTHE,
-  title={Scheduling the Learning Rate Via Hypergradients: New Insights and a New Algorithm},
+  title={MARTHE: Scheduling the Learning Rate Via Online Hypergradients},
   author={Donini, Michele and Franceschi, Luca and Majumder, Orchid and Pontil, Massimiliano and Frasconi, Paolo},
   booktitle={Proceedings of the 29th International Joint Conference on Artificial Intelligence and the 17th Pacific Rim International Conference on Artificial Intelligence},
   year={2020},
