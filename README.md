@@ -11,12 +11,12 @@ methods (such as SGD) only on the basis of the given learning task, aiming at pr
 with associated small validation error.
 
 Theoretically, we have to solve the problem of finding a learning rate (LR) schedule under the framework of  gradient-based hyperparameter optimization.
-In this sense, we consider as an optimal schedule <img src="https://render.githubusercontent.com/render/math?math=\eta^*=(\eta^*_0,\dots,\eta^*_{T-1})\in\mathbb{R}_{\geq0}^T"> a solution to the following constrained optimization problem:
+In this sense, we consider as an optimal schedule <img src="https://render.githubusercontent.com/render/math?math=\eta^*=(\eta^*_0,\dots,\eta^*_{T-1})\in\mathbb{R}_{\geq{0}}^T"> a solution to the following constrained optimization problem:
 
-<img src="https://render.githubusercontent.com/render/math?math=\min%20\{f_T(\eta)=E(w_T(\eta)):\eta\in\mathbb{R}_{\geq0}^T\}\quad%20s.t.\quad%20w_0=\bar{w},\quad%20w_{t+1}(\eta)=\Phi_t(w_{t}(\eta),\eta_t)" title="" />
+<img src="https://render.githubusercontent.com/render/math?math=\min%20\{f_T(\eta)=E(w_T(\eta)):\eta\in\mathbb{R}_{\geq{0}}^T\}\quad%20s.t.\quad%20w_0=\bar{w},\quad%20w_{t+1}(\eta)=\Phi_t(w_{t}(\eta),\eta_t)" title="" />
 
 for <img src="https://render.githubusercontent.com/render/math?math=t=\{0,%20\dots,%20T-1\}" title=" " />,
-where <img src="https://render.githubusercontent.com/render/math?math=E:\mathbb{R}^d\to\mathbb{R}_{\geq0}" title=" " /> is an objective function,
+where <img src="https://render.githubusercontent.com/render/math?math=E:\mathbb{R}^d\to\mathbb{R}_{\geq{0}}" title=" " /> is an objective function,
 <img src="https://render.githubusercontent.com/render/math?math=\Phi_t:\mathbb{R}^d\times%20\mathbb{R}_{\geq0}\to\mathbb{R}^d" title=" " /> is a (possibly stochastic) weight update dynamics,
 <img src="https://render.githubusercontent.com/render/math?math=\bar{w}\in\mathbb{R}^d" title=" " /> represents the initial model weights (parameters) and finally
 <img src="https://render.githubusercontent.com/render/math?math=w_t" title=" " /> are the weights after t iterations. 
